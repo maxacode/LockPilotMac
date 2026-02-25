@@ -1,4 +1,4 @@
-# LockPilot (Mac)
+# LockPilot - Made by Maks (Mac)
 
 A macOS desktop app to schedule multiple one-time timers with actions:
 - popup message
@@ -18,6 +18,9 @@ You can add any number of timers, see active timers with due times/countdown, an
 - Rollback by selecting a specific release tag/version
 
 ## Changelog
+- `v0.2.1`:
+  - Updated app/window title to `LockPilot - Made by Maks`.
+  - Bumped application version metadata.
 - `v0.2.0`:
   - Added GitHub release update checks in-app.
   - Added auto-check on launch toggle.
@@ -31,7 +34,7 @@ If you distribute an unsigned or non-notarized `.app`, macOS may block it with a
 You can remove the quarantine flag manually:
 
 ```bash
-sudo xattr -dr com.apple.quarantine "/Applications/LockPilot.app"
+sudo xattr -dr com.apple.quarantine "/Applications/LockPilot - Made by Maks.app"
 ```
 
 WARNING: This bypasses a Gatekeeper safety check and allows the app to run without notarization.
@@ -75,4 +78,3 @@ From `src-tauri/`:
 - `cargo tauri build`
 
 Output app bundle will be under `src-tauri/target/release/bundle/`.
-
