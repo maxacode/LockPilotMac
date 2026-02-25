@@ -1,4 +1,5 @@
 # LockPilot - Made by Maks (Mac)
+![LockPilot Screenshot](assets/app-screenshot.png)
 
 A macOS desktop app to schedule multiple one-time timers with actions:
 - popup message
