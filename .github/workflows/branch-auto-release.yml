@@ -36,14 +36,16 @@ jobs:
         shell: bash
         run: |
           BRANCH="${GITHUB_REF_NAME}"
+          VERSION=$(grep -m1 '"version"' src-tauri/tauri.conf.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
+
           if [[ "$BRANCH" == "main" ]]; then
-            TAG="main-latest"
-            NAME="Main Latest"
+            TAG="v${VERSION}"
+            NAME="v${VERSION}"
             PRERELEASE="false"
             MAKE_LATEST="true"
           else
-            TAG="dev-latest"
-            NAME="Dev Latest"
+            TAG="v${VERSION}-dev.${GITHUB_RUN_NUMBER}"
+            NAME="v${VERSION}-dev.${GITHUB_RUN_NUMBER}"
             PRERELEASE="true"
             MAKE_LATEST="false"
           fi
@@ -55,6 +57,7 @@ jobs:
           echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
           echo "make_latest=$MAKE_LATEST" >> "$GITHUB_OUTPUT"
           echo "dmg_path=$DMG_PATH" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Publish branch release
         uses: ncipollo/release-action@v1
@@ -65,6 +68,7 @@ jobs:
           makeLatest: ${{ steps.meta.outputs.make_latest }}
           body: |
             Auto-generated from `${{ github.ref_name }}` at `${{ github.sha }}`.
+            App version: `${{ steps.meta.outputs.version }}`
           allowUpdates: true
           replacesArtifacts: true
           artifacts: ${{ steps.meta.outputs.dmg_path }}
