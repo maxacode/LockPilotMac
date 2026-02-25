@@ -1,0 +1,70 @@
+name: Branch Auto Release
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --locked
+
+      - name: Build DMG
+        run: cargo tauri build --bundles dmg
+        working-directory: src-tauri
+
+      - name: Compute release metadata
+        id: meta
+        shell: bash
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          if [[ "$BRANCH" == "main" ]]; then
+            TAG="main-latest"
+            NAME="Main Latest"
+            PRERELEASE="false"
+            MAKE_LATEST="true"
+          else
+            TAG="dev-latest"
+            NAME="Dev Latest"
+            PRERELEASE="true"
+            MAKE_LATEST="false"
+          fi
+
+          DMG_PATH=$(find src-tauri/target/release/bundle/dmg -name "*.dmg" -maxdepth 1 | head -n 1)
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "make_latest=$MAKE_LATEST" >> "$GITHUB_OUTPUT"
+          echo "dmg_path=$DMG_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Publish branch release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          makeLatest: ${{ steps.meta.outputs.make_latest }}
+          body: |
+            Auto-generated from `${{ github.ref_name }}` at `${{ github.sha }}`.
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: ${{ steps.meta.outputs.dmg_path }}
