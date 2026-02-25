@@ -44,6 +44,10 @@ You can add any number of timers, see active timers with due times/countdown, an
   - Added CI workflow for PR checks and signed/notarized release pipeline.
 
 ## Install on Mac
+Quick Start:
+- Stable (main): [Download latest release](https://github.com/maxacode/LockPilotMac/releases/latest)
+- Dev (dev): [Download latest dev prerelease](https://github.com/maxacode/LockPilotMac/releases/tag/dev-latest)
+
 If you distribute an unsigned or non-notarized `.app`, macOS may block it with a "damaged and can't be opened" message.
 
 You can remove the quarantine flag manually:
