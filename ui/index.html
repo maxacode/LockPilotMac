@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LockPilot</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="card">
+        <h1>LockPilot</h1>
+        <p class="subtitle">Schedule multiple system actions for exact times.</p>
+
+        <form id="timer-form" class="form">
+          <label>
+            Action
+            <select id="action" required>
+              <option value="popup">Popup Message</option>
+              <option value="lock">Lock Screen</option>
+              <option value="shutdown">Shut Down Mac</option>
+              <option value="reboot">Restart Mac</option>
+            </select>
+          </label>
+
+          <label>
+            Trigger Time
+            <input id="target-time" type="datetime-local" required />
+          </label>
+
+          <label id="message-wrap">
+            Popup Message
+            <textarea id="message" rows="3" placeholder="Time to stop and rest" required></textarea>
+          </label>
+
+          <button type="submit">Add Timer</button>
+        </form>
+
+        <p id="status" class="status"></p>
+      </section>
+
+      <section class="card">
+        <div class="header-row">
+          <h2>Active Timers</h2>
+          <button id="refresh" class="secondary">Refresh</button>
+        </div>
+        <ul id="timers" class="timer-list"></ul>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
