@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "LockPilot - Made by Maks",
+  "productName": "LockPilot",
   "version": "0.2.2",
   "identifier": "com.maks.lockpilot",
   "build": {

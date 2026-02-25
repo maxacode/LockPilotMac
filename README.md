@@ -41,7 +41,7 @@ If you distribute an unsigned or non-notarized `.app`, macOS may block it with a
 You can remove the quarantine flag manually:
 
 ```bash
-sudo xattr -dr com.apple.quarantine "/Applications/LockPilot - Made by Maks.app"
+sudo xattr -dr com.apple.quarantine "/Applications/LockPilot.app"
 ```
 
 WARNING: This bypasses a Gatekeeper safety check and allows the app to run without notarization.
