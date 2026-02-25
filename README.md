@@ -1,4 +1,5 @@
 # LockPilot - Made by Maks (Mac)
+![LockPilot Screenshot](assets/app-screenshot.png)
 
 A macOS desktop app to schedule system actions for specific times, including recurring schedules, update channels, and rollback support.
 
