@@ -1,5 +1,12 @@
-const { invoke } = window.__TAURI__.core;
-const { getVersion } = window.__TAURI__.app;
+const isTauriRuntime = Boolean(window.__TAURI__?.core?.invoke);
+const invoke = isTauriRuntime
+  ? window.__TAURI__.core.invoke
+  : async () => {
+      throw new Error("Backend unavailable in browser preview mode");
+    };
+const getVersion = isTauriRuntime
+  ? window.__TAURI__.app.getVersion
+  : async () => "0.0.0-local-preview";
 
 const form = document.getElementById("timer-form");
 const actionInput = document.getElementById("action");
@@ -14,6 +21,7 @@ const statusEl = document.getElementById("status");
 const refreshBtn = document.getElementById("refresh");
 
 const checkUpdatesBtn = document.getElementById("check-updates");
+const mockUpdateBtn = document.getElementById("mock-update");
 const autoCheckUpdatesInput = document.getElementById("auto-check-updates");
 const updateChannelSelect = document.getElementById("update-channel");
 const currentVersionEl = document.getElementById("current-version");
@@ -184,8 +192,20 @@ const renderUpdateResult = (update) => {
   updateResultEl.classList.remove("hidden");
   latestVersionEl.textContent = update.tag;
   latestNotesEl.textContent = update.notes?.trim()
-    ? update.notes.split("\n")[0]
+    ? update.notes.trim()
     : "No release notes provided.";
+};
+
+const showMockUpdatePreview = () => {
+  const mock = {
+    tag: "v0.4.11",
+    name: "Mock Release Preview",
+    publishedAt: new Date().toISOString(),
+    notes: `### What's changed\n- Added full changelog preview in updater panel\n- Improved update check UX with clearer status messages\n- Minor timer UI polish and stability fixes\n\n### Notes\nThis is a local mock preview (no backend call).`,
+  };
+
+  renderUpdateResult(mock);
+  showUpdateStatus("Showing mock update preview (local only).");
 };
 
 const loadRollbackVersions = async () => {
@@ -296,6 +316,7 @@ actionInput.addEventListener("change", toggleMessage);
 recurrencePresetInput.addEventListener("change", toggleRecurrence);
 
 checkUpdatesBtn.addEventListener("click", () => checkForUpdates(false));
+mockUpdateBtn.addEventListener("click", showMockUpdatePreview);
 installLatestBtn.addEventListener("click", installChannelUpdate);
 
 rollbackInstallBtn.addEventListener("click", async () => {
@@ -321,17 +342,36 @@ const initialize = async () => {
   targetTimeInput.value = toLocalDateTimeValue(LAUNCH_TIME);
   toggleMessage();
   toggleRecurrence();
-  await loadTimers();
-  setInterval(loadTimers, 1000);
-
-  currentVersion = await getVersion();
-  currentVersionEl.textContent = currentVersion;
 
   const savedChannel = localStorage.getItem(UPDATE_CHANNEL_KEY);
   updateChannelSelect.value = savedChannel === "dev" ? "dev" : "main";
 
   const autoCheckSetting = localStorage.getItem(AUTO_UPDATE_KEY);
   autoCheckUpdatesInput.checked = autoCheckSetting !== "0";
+
+  if (!isTauriRuntime) {
+    currentVersion = await getVersion();
+    currentVersionEl.textContent = `${currentVersion} (preview)`;
+    showStatus("Browser preview mode: backend/timers disabled.");
+    showUpdateStatus("Use 'Mock Update Preview' to test changelog UI.");
+    renderTimers([]);
+    checkUpdatesBtn.disabled = true;
+    installLatestBtn.disabled = true;
+    rollbackInstallBtn.disabled = true;
+    autoCheckUpdatesInput.disabled = true;
+    rollbackVersionSelect.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Unavailable in preview mode";
+    rollbackVersionSelect.appendChild(option);
+    return;
+  }
+
+  await loadTimers();
+  setInterval(loadTimers, 1000);
+
+  currentVersion = await getVersion();
+  currentVersionEl.textContent = currentVersion;
 
   await loadRollbackVersions();
 
